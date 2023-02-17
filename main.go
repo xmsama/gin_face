@@ -21,9 +21,9 @@ const (
 func main() {
 	//初始化人脸识别器
 	rec, err := face.NewRecognizer(modelDir)
-	//if err != nil {
-	//	fmt.Println("Cannot INItialize recognizer")
-	//}
+	if err != nil {
+		fmt.Println("Cannot INItialize recognizer")
+	}
 	//defer rec.Close()
 
 	//干一个数据库
