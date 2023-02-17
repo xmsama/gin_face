@@ -29,7 +29,7 @@ func GetDB() (*gorm.DB, error) {
 	)
 
 	//dsn := env.Mysql.Username + ":" + env.Mysql.Password + "@(" + env.Mysql.Url + ":" + strconv.Itoa(env.Mysql.Port) + ")/genshinstudio?charset=utf8mb4&parseTime=True&loc=Local&timeout=3s"
-	dsn := "root:wodemima@(101.42.249.68:3306)/face?charset=utf8&parseTime=True&loc=Local"
+	dsn := "xmsama:wodemima@(101.42.249.68:3306)/face?charset=utf8&parseTime=True&loc=Local"
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{
 		Logger:                 slowLogger,
 		SkipDefaultTransaction: true, //禁用事务
