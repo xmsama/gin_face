@@ -22,14 +22,14 @@ func GetDB() (*gorm.DB, error) {
 			//设定慢查询时间阈值为1000ms
 			SlowThreshold: 5 * time.Second,
 			//设置日志级别，只有Warn和Info级别会输出慢查询日志
-			LogLevel:                  logger.Silent,
+			LogLevel:                  logger.Info,
 			IgnoreRecordNotFoundError: true,
 			Colorful:                  true,
 		},
 	)
 
 	//dsn := env.Mysql.Username + ":" + env.Mysql.Password + "@(" + env.Mysql.Url + ":" + strconv.Itoa(env.Mysql.Port) + ")/genshinstudio?charset=utf8mb4&parseTime=True&loc=Local&timeout=3s"
-	dsn := "root:wodemima@(127.0.0.1:3306)/face?charset=utf8&parseTime=True&loc=Local"
+	dsn := "root:wodemima@(101.42.249.68:3306)/face?charset=utf8&parseTime=True&loc=Local"
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{
 		Logger:                 slowLogger,
 		SkipDefaultTransaction: true, //禁用事务
