@@ -61,7 +61,7 @@ func main() {
 		}
 		// 打印人脸数量
 		fmt.Println("图片人脸数量: ", len(faces))
-		if len(faces) > 1 {
+		if len(faces) > 0 || len(faces) == 0 {
 			fmt.Println("图片人脸数量大于一个 不对劲")
 			continue
 		}
