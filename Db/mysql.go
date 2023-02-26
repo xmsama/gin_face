@@ -22,7 +22,7 @@ func GetDB() (*gorm.DB, error) {
 			//设定慢查询时间阈值为1000ms
 			SlowThreshold: 5 * time.Second,
 			//设置日志级别，只有Warn和Info级别会输出慢查询日志
-			LogLevel:                  logger.Info,
+			LogLevel:                  logger.Warn,
 			IgnoreRecordNotFoundError: true,
 			Colorful:                  true,
 		},
@@ -59,6 +59,7 @@ func GetDB() (*gorm.DB, error) {
 		fmt.Println("Mysql Connect Failed")
 		return nil, err
 	}
+	fmt.Println("数据库连接成功")
 	return db, err
 }
 

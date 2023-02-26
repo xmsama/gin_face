@@ -1,13 +1,9 @@
 package main
 
 import (
-	"encoding/binary"
 	"face/Db"
 	"face/Global"
-	"face/Models"
-	"fmt"
-	"github.com/Kagami/go-face"
-	"math"
+	"face/Route"
 )
 
 const dataDir = "testdata"
@@ -19,45 +15,50 @@ const (
 )
 
 func main() {
-	//初始化人脸识别器
-	rec, err := face.NewRecognizer(modelDir)
-	if err != nil {
-		fmt.Println("Cannot INItialize recognizer")
-	}
+	Global.DB, _ = Db.GetDB()
+	Route.InitRouter()
+	////初始化人脸识别器
+	//rec, err := face.NewRecognizer(modelDir)
+	//if err != nil {
+	//	fmt.Println("Cannot INItialize recognizer")
+	//}
 	//defer rec.Close()
 
 	//干一个数据库
-	Global.DB, _ = Db.GetDB()
-	db := Global.DB
-	//识别测试
-	var FaceList []Models.Face
-	var samples []face.Descriptor
-	db.Find(&FaceList)
-	var cats []int32
-	//fmt.Println(FaceList)
-	for i, faceData := range FaceList {
-		cats = append(cats, int32(i))
-		floatData := make([]float32, len(faceData.Data)/4)
-		for i := 0; i < len(floatData); i++ {
-			bytes := faceData.Data[i*4 : (i+1)*4]
-			floatValue := math.Float32frombits(binary.LittleEndian.Uint32(bytes))
-			floatData[i] = floatValue
-		}
-		var descriptor face.Descriptor
-		copy(descriptor[:], floatData)
 
-		fmt.Println(faceData.Name)
-		//sample, err := face.DescriptorDeserialize(faceData.Data)
-		//if err != nil {
-		//	// 处理错误
-		//}
-		samples = append(samples, descriptor)
-		//labels = append(labels, int32(faceData.ID))
-	}
-	rec.SetSamples(samples, cats)
-	nayoungFace, err := rec.RecognizeSingleFile(imagesDir + "/bona.jpg")
-	catID := rec.Classify(nayoungFace.Descriptor)
-	fmt.Println(catID)
+	//db := Global.DB
+
+	//识别测试
+	//var FaceList []Models.Face
+	//var samples []face.Descriptor
+	//db.Find(&FaceList)
+	//var cats []int32
+	//fmt.Println(time.Now())
+	//for _, faceData := range FaceList {
+	//	cats = append(cats, int32(faceData.Id))
+	//	floatData := make([]float32, len(faceData.Data)/4)
+	//	for i := 0; i < len(floatData); i++ {
+	//		bytes := faceData.Data[i*4 : (i+1)*4]
+	//		floatValue := math.Float32frombits(binary.LittleEndian.Uint32(bytes))
+	//		floatData[i] = floatValue
+	//	}
+	//	var descriptor face.Descriptor
+	//	copy(descriptor[:], floatData)
+	//
+	//	//fmt.Println(faceData.Name)
+	//	//sample, err := face.DescriptorDeserialize(faceData.Data)
+	//	//if err != nil {
+	//	//	// 处理错误
+	//	//}
+	//	//fmt.Println(descriptor)
+	//	samples = append(samples, descriptor)
+	//	//labels = append(labels, int32(faceData.ID))
+	//}
+	//rec.SetSamples(samples, cats)
+	//nayoungFace, err := rec.RecognizeSingleFile(imagesDir + "/wx.jpg")
+	//catID := rec.Classify(nayoungFace.Descriptor)
+	//fmt.Println(catID)
+	//fmt.Println(time.Now())
 	////遍历测试
 	//dir, err := os.Open("./testdata/images")
 	//if err != nil {
@@ -98,17 +99,8 @@ func main() {
 	//	fmt.Println("生成" + file.Name() + "人脸数据成功")
 	//
 	//}
+
 	//
-	//// 调用该方法，传入路径。返回面部数量和任何错误
-	//faces, err := rec.RecognizeFile(imagesDir + "/bona.jpg")
-	//if err != nil {
-	//	log.Fatalf("无法识别: %v", err)
-	//}
-	//// 打印人脸数量
-	//fmt.Println("图片人脸数量: ", len(faces))
-	//if len(faces) > 1 {
-	//	fmt.Println("图片人脸数量大于一个 不对劲")
-	//}
 	//
 	//
 	//
