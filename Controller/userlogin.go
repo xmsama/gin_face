@@ -36,30 +36,78 @@ type LoginResp struct {
 	Msg string `json:"msg"`
 }
 
+type InfoResp struct {
+	Code int `json:"code"`
+	Data struct {
+		User struct {
+			ID          int    `json:"ID"`
+			UserName    string `json:"userName"`
+			NickName    string `json:"nickName"`
+			SideMode    string `json:"sideMode"`
+			HeaderImg   string `json:"headerImg"`
+			BaseColor   string `json:"baseColor"`
+			ActiveColor string `json:"activeColor"`
+			AuthorityID string `json:"authorityId"`
+			Authority   struct {
+				DefaultRouter string `json:"defaultRouter"`
+			} `json:"authority"`
+		} `json:"userInfo"`
+		Token     string `json:"token"`
+		ExpiresAt string `json:"expiresAt"`
+	} `json:"data"`
+	Msg string `json:"msg"`
+}
+
 func Login(c *gin.Context) {
 	data, _ := c.GetRawData()
 	var datamap map[string]string
-
+	db := Global.DB
 	err := Utils.UnmarshalJSON(c, data, &datamap)
 	if err != nil {
 		return
 	}
+	var Account Models.Account
+	var CaptchaCount int64
 
+	db.Model(Global.CaptchaModel).Where("id = ? and result = ?", datamap["captchaId"], datamap["captcha"]).Count(&CaptchaCount)
+
+	if CaptchaCount < 1 {
+		c.JSON(http.StatusOK, gin.H{
+			"code": 7,
+			"msg":  "验证码错误",
+		})
+		//删除无效验证码
+		db.Delete(Global.CaptchaModel, "id = ?", datamap["captchaId"])
+
+		return
+	}
+	//先问问验证码对不对
+
+	//去找数据库要数据
+
+	db.Where("account = ? and password = ? ", datamap["username"], datamap["password"]).Take(&Account)
+	if Account.Account == "" {
+		c.JSON(http.StatusOK, gin.H{
+			"code": 7,
+			"msg":  "账号或密码错误",
+		})
+		return
+	}
 	// 设置Payload
 	claims := jwt.MapClaims{
-		"account": "example_account",
+		"account": Account.Account,
 		"time":    time.Now().Unix(),
 	}
 
 	// 设置过期时间
-	expirationTime := time.Now().Add(5 * time.Minute)
+	expirationTime := time.Now().Add(60 * time.Minute)
 	claims["exp"] = expirationTime.Unix()
 
 	// 创建token对象
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
 	// 设置签名密钥并签名
-	signingKey := []byte("your-secret-key")
+	signingKey := []byte(Global.JWTKey)
 	tokenString, err := token.SignedString(signingKey)
 	if err != nil {
 		fmt.Println("JWT签名失败：", err)
@@ -98,15 +146,15 @@ func AddUser(c *gin.Context) {
 func Captcha(c *gin.Context) {
 	db := Global.DB
 
-	var Count int64
-	db.Model(Global.CaptchaModel).Count(&Count)
+	//删除过期验证码
+	db.Delete(Global.CaptchaModel, "time+150 < ?", time.Now().Unix())
 
 	config := base64Captcha.DriverString{
 		Height:     30,
 		Width:      100,
 		NoiseCount: 0,
 		Length:     5,
-		Source:     "1234567890abcdefghijklmnopqrstuvwxyz",
+		Source:     "1234567890abcdefghjkmnopqrstuvwxyz",
 		BgColor:    &color.RGBA{R: 255, G: 255, B: 255, A: 255},
 
 		Fonts: nil,
@@ -114,7 +162,7 @@ func Captcha(c *gin.Context) {
 	captcha := base64Captcha.NewCaptcha(&config, base64Captcha.DefaultMemStore)
 	id, b64, _ := captcha.Generate()
 	key := captcha.Store.Get(id, true)
-	NewCp := Models.Captcha{Base64: b64, Result: key}
+	NewCp := Models.Captcha{Base64: b64, Result: key, Time: int(time.Now().Unix())}
 	db.Create(&NewCp)
 	c.JSON(http.StatusOK, gin.H{
 		"code":          0,
@@ -123,4 +171,19 @@ func Captcha(c *gin.Context) {
 		"captchaLength": 5,
 	})
 
+}
+
+func GetUserInfo(c *gin.Context) {
+	var InfoResp InfoResp
+	InfoResp.Data.User.ID = 1
+	InfoResp.Data.User.UserName = "管理员"
+	InfoResp.Data.User.NickName = "管理员"
+	InfoResp.Data.User.SideMode = "light"
+	InfoResp.Data.User.HeaderImg = "@/assets/userimage.png"
+	InfoResp.Data.User.BaseColor = "#fff"
+	//LoginResp.Data.User.
+	InfoResp.Data.User.ActiveColor = "#1890ff"
+	InfoResp.Data.User.Authority.DefaultRouter = "dashboard"
+	jsonStr, _ := json.Marshal(InfoResp)
+	c.String(http.StatusOK, string(jsonStr))
 }

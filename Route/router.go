@@ -24,6 +24,10 @@ func InitRouter() {
 		api.POST("/Captcha", Controller.Captcha)
 
 		api.POST("/GetIndexInfo", Controller.GetIndexInfo)
+		api.GET("/GetUserInfo", Controller.GetUserInfo)
+
+		api.POST("/SetClassInfo", Controller.SetClassInfo)
+		api.POST("/GetClassList", Controller.GetClassList)
 
 	}
 	router.Run(":8887")

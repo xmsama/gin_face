@@ -15,6 +15,7 @@ const (
 )
 
 func main() {
+	Global.JWTKey = "jnjhJ9D@2^32jkFgVfOt"
 	Global.DB, _ = Db.GetDB()
 	Route.InitRouter()
 	////初始化人脸识别器

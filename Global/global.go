@@ -9,6 +9,9 @@ var (
 	DB           *gorm.DB
 	FaceModel    Models.Face
 	CaptchaModel Models.Captcha
+	AccountModel Models.Account
+	ClassModel   Models.Class
+	JWTKey       string
 	//SettingModel      Models.Setting
 	//CardModel         Models.Card
 	//AccountModel      Models.Account
