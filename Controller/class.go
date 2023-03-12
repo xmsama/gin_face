@@ -152,7 +152,7 @@ func GetUserList(c *gin.Context) {
 	for _, record := range User {
 		var Class Models.Class
 		db.Where("id = ? ", record.UserClass).Take(&Class)
-		list := []List{{ID: record.Id, Name: record.UserName, Class: Class.Name, ClassId: record.UserClass, Image: "/img/abc.png", Status: "未生成人脸数据"}}
+		list := []List{{ID: record.Id, Name: record.UserName, Class: Class.Name, ClassId: record.UserClass, Image: record.Image, Status: "未生成人脸数据"}}
 		AllList = append(AllList, list...)
 	}
 
@@ -173,13 +173,23 @@ func SetUserInfo(c *gin.Context) {
 	ClassId, _ := strconv.Atoi(fmt.Sprintf("%v", ReqMap["ClassId"]))
 	Id := ReqMap["ID"]
 	B64 := fmt.Sprintf("%v", ReqMap["Image"])
-	//fmt.Println((B64)
-	//return
+	if ReqMap["ClassId"] == "" || Name == "" {
+		c.JSON(http.StatusOK, gin.H{
+			"code": 7,
+			"msg":  "信息不全！",
+		})
+		return
+	}
 	var Msg string
 	db := Global.DB
-	fmt.Println("id:", Id)
 	if Id == "" || Id == nil {
-
+		if B64 == "" {
+			c.JSON(http.StatusOK, gin.H{
+				"code": 7,
+				"msg":  "请上传图片！",
+			})
+			return
+		}
 		NewLessonTime := Models.UserList{UserName: Name, UserClass: ClassId, Image: B64}
 		db.Create(&NewLessonTime)
 		Msg = "新增成功"
