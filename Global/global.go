@@ -13,6 +13,8 @@ var (
 	ClassModel      Models.Class
 	UserListModel   Models.UserList
 	LessontimeModel Models.Lessontime
+	LessonModel     Models.Lesson
+	ClassRoomModel  Models.Classroom
 	JWTKey          string
 	ImgPath         string
 	//SettingModel      Models.Setting

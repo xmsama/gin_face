@@ -4,6 +4,7 @@ import (
 	"face/Global"
 	"face/Models"
 	"face/Utils"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"regexp"
@@ -83,21 +84,7 @@ func SetLessonTime(c *gin.Context) {
 		db.Model(&Global.LessontimeModel).Where("id = ?", Id).Updates(map[string]interface{}{"starttime": Stime})
 		Msg = "修改成功"
 	}
-	//db.Model(&Global.LessontimeModel).Where("Name = ?", Name).Count(&Total)
-	////if Total < 1 {
-	////	NewLessonTime := Models.Lessontime{Name: Name, Starttime: Stime}
-	////	db.Create(&NewLessonTime)
-	////	Msg = "新增成功"
-	//} else if Total > 0 {
-	//	db.Model(&Global.LessontimeModel).Where("Id = ?", Id).Updates(map[string]interface{}{"Stime": Stime})
-	//	Msg = "修改成功"
-	//} else {
-	//	c.JSON(http.StatusOK, gin.H{
-	//		"code": 7,
-	//		"msg":  "异常错误",
-	//	})
-	//	return
-	//}
+
 	c.JSON(http.StatusOK, gin.H{
 		"code": 0,
 		"msg":  Msg,
@@ -121,5 +108,52 @@ func DelLessonTime(c *gin.Context) {
 }
 
 func GetLessonList(c *gin.Context) {
+	type List struct {
+		Name       string `json:"Name"`
+		Class      string `json:"Class"`
+		LessonTime string `json:"LessonTime"`
+		ClassRoom  string `json:"ClassRoom"`
+	}
+	type Data struct {
+		List     []List `json:"list"`
+		Total    int    `json:"total"`
+		PageSize int    `json:"pageSize"`
+		Page     int    `json:"page"`
+	}
+	type LessonResp struct {
+		Code int  `json:"code"`
+		Data Data `json:"data"`
+	}
+	data, _ := c.GetRawData()
+	var ReqMap map[string]interface{}
+	err := Utils.UnmarshalJSON(c, data, &ReqMap)
+	if err != nil {
+		return
+	}
+	page, _ := strconv.Atoi(fmt.Sprintf("%v", ReqMap["page"]))
+	pageSize, _ := strconv.Atoi(fmt.Sprintf("%v", ReqMap["pageSize"]))
 
+	var Total int64
+	var Lesson []Models.Lesson
+
+	var AllList []List
+	//tempsql := Utils.SearchSql(ReqMap, 5)
+	tempsql := ""
+	db := Global.DB
+	if tempsql != "" {
+		db.Where(tempsql).Offset((page - 1) * pageSize).Limit(pageSize).Find(&Lesson)
+		db.Model(&Global.LessonModel).Where(tempsql).Count(&Total)
+	} else {
+		db.Model(&Global.LessonModel).Offset((page - 1) * pageSize).Limit(pageSize).Find(&Lesson)
+		db.Model(&Global.LessonModel).Count(&Total)
+	}
+
+	for _, record := range Lesson {
+		list := []List{{Name: record.Name, Class: "班级名称123124215", ClassRoom: "某个牛逼的教室", LessonTime: "第三节课"}}
+		AllList = append(AllList, list...)
+	}
+	c.JSON(http.StatusOK, LessonResp{
+		0,
+		Data{List: AllList, Total: int(Total), Page: page, PageSize: pageSize},
+	})
 }

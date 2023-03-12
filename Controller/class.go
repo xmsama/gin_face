@@ -12,9 +12,45 @@ import (
 )
 
 func SetClassInfo(c *gin.Context) {
+	data, _ := c.GetRawData()
+	var ReqMap map[string]string
+	err := Utils.UnmarshalJSON(c, data, &ReqMap)
+	if err != nil {
+		return
+	}
+	Name := ReqMap["Name"]
+	Id := ReqMap["ID"]
+	db := Global.DB
+	var Msg string
+
+	if Id == "" {
+		NewClass := Models.Class{Name: Name}
+		db.Create(&NewClass)
+		Msg = "新增成功"
+	} else {
+		db.Model(&Global.LessontimeModel).Where("id = ?", Id).Updates(map[string]interface{}{"name": Name})
+		Msg = "修改成功"
+	}
 	c.JSON(http.StatusOK, gin.H{
 		"code": 0,
-		"msg":  "giao",
+		"msg":  Msg,
+	})
+}
+
+func DelClass(c *gin.Context) {
+	data, _ := c.GetRawData()
+	var ReqMap map[string]int
+	err := Utils.UnmarshalJSON(c, data, &ReqMap)
+	if err != nil {
+		return
+	}
+	ID := ReqMap["ID"]
+	db := Global.DB
+	db.Where("id = ?", ID).Delete(&Models.Class{})
+	db.Where("userclass = ?", ID).Delete(&Models.UserList{})
+	c.JSON(http.StatusOK, gin.H{
+		"code": 0,
+		"msg":  "删除成功",
 	})
 }
 
@@ -60,7 +96,7 @@ func GetClassList(c *gin.Context) {
 	}
 	var AllList []List
 	for _, record := range Class {
-		list := []List{{Name: record.Name, Count: 114, Status: "正常", Time: int(time.Now().Unix())}}
+		list := []List{{Name: record.Name, Count: 114, ID: record.Id, Status: "正常", Time: int(time.Now().Unix())}}
 		AllList = append(AllList, list...)
 	}
 
@@ -75,10 +111,12 @@ func GetClassList(c *gin.Context) {
 }
 func GetUserList(c *gin.Context) {
 	type List struct {
-		Name   string `json:"Name"`
-		Class  string `json:"Class"`
-		Image  string `json:"Image"`
-		Status string `json:"Status"`
+		Name    string `json:"Name"`
+		ID      int    `json:"ID"`
+		Class   string `json:"Class"`
+		ClassId int    `json:"ClassId"`
+		Image   string `json:"Image"`
+		Status  string `json:"Status"`
 	}
 	type Data struct {
 		List     []List `json:"list"`
@@ -112,12 +150,58 @@ func GetUserList(c *gin.Context) {
 	}
 	var AllList []List
 	for _, record := range User {
-		list := []List{{Name: record.UserName, Class: "我是一个班级个班级个班级个班级个班级", Image: "/img/abc.png", Status: "未生成人脸数据"}}
+		var Class Models.Class
+		db.Where("id = ? ", record.UserClass).Take(&Class)
+		list := []List{{ID: record.Id, Name: record.UserName, Class: Class.Name, ClassId: record.UserClass, Image: "/img/abc.png", Status: "未生成人脸数据"}}
 		AllList = append(AllList, list...)
 	}
 
 	c.JSON(http.StatusOK, UserListResp{
 		0,
 		Data{List: AllList, Total: int(Total), Page: page, PageSize: pageSize},
+	})
+}
+
+func SetUserInfo(c *gin.Context) {
+	data, _ := c.GetRawData()
+	var ReqMap map[string]interface{}
+	err := Utils.UnmarshalJSON(c, data, &ReqMap)
+	if err != nil {
+		return
+	}
+	Name := fmt.Sprintf("%v", ReqMap["Name"])
+	ClassId, _ := strconv.Atoi(fmt.Sprintf("%v", ReqMap["ClassId"]))
+	Id := ReqMap["ID"]
+	B64 := fmt.Sprintf("%v", ReqMap["Image"])
+	//fmt.Println((B64)
+	//return
+	var Msg string
+	db := Global.DB
+	fmt.Println("id:", Id)
+	if Id == "" || Id == nil {
+
+		NewLessonTime := Models.UserList{UserName: Name, UserClass: ClassId, Image: B64}
+		db.Create(&NewLessonTime)
+		Msg = "新增成功"
+	} else {
+		if B64 == "" {
+			db.Model(&Global.UserListModel).Where("id = ?", Id).Updates(map[string]interface{}{"username": Name, "userclass": ClassId})
+		} else {
+			db.Model(&Global.UserListModel).Where("id = ?", Id).Updates(map[string]interface{}{"username": Name, "userclass": ClassId, "image": B64})
+		}
+
+		Msg = "修改成功"
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"code": 0,
+		"msg":  Msg,
+	})
+
+}
+
+func Upload(c *gin.Context) {
+	c.JSON(http.StatusOK, gin.H{
+		"code": 0,
 	})
 }
