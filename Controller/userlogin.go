@@ -154,7 +154,7 @@ func Captcha(c *gin.Context) {
 		Width:      100,
 		NoiseCount: 0,
 		Length:     5,
-		Source:     "1234567890abcdefghjkmnopqrstuvwxyz",
+		Source:     "1234567890",
 		BgColor:    &color.RGBA{R: 255, G: 255, B: 255, A: 255},
 
 		Fonts: nil,

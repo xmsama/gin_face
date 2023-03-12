@@ -13,7 +13,7 @@ import (
 func UnmarshalJSON(c *gin.Context, data []byte, v interface{}, msg ...string) error {
 
 	if len(msg) == 0 {
-		msg = []string{"結構錯誤"}
+		msg = []string{"请求结构错误"}
 	}
 	//fmt.Println(string(data))
 	err := json.Unmarshal(data, v)

@@ -6,12 +6,15 @@ import (
 )
 
 var (
-	DB           *gorm.DB
-	FaceModel    Models.Face
-	CaptchaModel Models.Captcha
-	AccountModel Models.Account
-	ClassModel   Models.Class
-	JWTKey       string
+	DB              *gorm.DB
+	FaceModel       Models.Face
+	CaptchaModel    Models.Captcha
+	AccountModel    Models.Account
+	ClassModel      Models.Class
+	UserListModel   Models.UserList
+	LessontimeModel Models.Lessontime
+	JWTKey          string
+	ImgPath         string
 	//SettingModel      Models.Setting
 	//CardModel         Models.Card
 	//AccountModel      Models.Account

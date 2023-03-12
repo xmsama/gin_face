@@ -15,6 +15,7 @@ const (
 )
 
 func main() {
+	Global.ImgPath = "./image/"
 	Global.JWTKey = "jnjhJ9D@2^32jkFgVfOt"
 	Global.DB, _ = Db.GetDB()
 	Route.InitRouter()

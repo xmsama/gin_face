@@ -29,6 +29,12 @@ func InitRouter() {
 		api.POST("/SetClassInfo", Controller.SetClassInfo)
 		api.POST("/GetClassList", Controller.GetClassList)
 
+		api.POST("/GetUserList", Controller.GetUserList)
+
+		api.POST("/GetLessonTime", Controller.GetLessonTime)
+		api.POST("/SetLessonTime", Controller.SetLessonTime)
+		api.POST("/DelLessonTime", Controller.DelLessonTime)
+
 	}
 	router.Run(":8887")
 }
