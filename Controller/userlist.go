@@ -127,7 +127,7 @@ func SetUserInfo(c *gin.Context) {
 		db.Create(&NewLessonTime)
 
 		// 将解码后的数据写入文件
-		file, err := os.Create(Global.ImgPath + "/" + strconv.Itoa(NewLessonTime.Id) + ".png")
+		file, err := os.Create(Global.ImgPath + "/" + strconv.Itoa(NewLessonTime.Id) + ".jpg")
 		if err != nil {
 			fmt.Println("创建文件失败", err)
 			return

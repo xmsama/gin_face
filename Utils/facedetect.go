@@ -18,8 +18,8 @@ func AddFace(ID int, B64Blob []byte) {
 	//	return
 	//}
 	db := Global.DB
-	db.Model(&Global.UserListModel).Where("id=  ? ", ID).Updates(map[string]interface{}{"image": Global.ImgPath + "/" + strconv.Itoa(ID) + ".png"})
-	faces, _ := Global.FaceRe.RecognizeFile(Global.ImgPath + "/" + strconv.Itoa(ID) + ".png")
+	db.Model(&Global.UserListModel).Where("id=  ? ", ID).Updates(map[string]interface{}{"image": Global.ImgPath + "/" + strconv.Itoa(ID) + ".jpg"})
+	faces, _ := Global.FaceRe.RecognizeFile(Global.ImgPath + "/" + strconv.Itoa(ID) + ".jpg")
 	descriptor := faces[0].Descriptor
 	descriptorBytes := (*(*[1 << 30]byte)(unsafe.Pointer(&descriptor[0])))[:len(descriptor)*4]
 	db.Model(&Global.UserListModel).Where("id=  ? ", ID).Updates(map[string]interface{}{"face": descriptorBytes})
@@ -56,6 +56,6 @@ func ReadImage(path string) (b64 string) {
 
 	// 将文件内容转换为 Base64 编码
 	encoded := base64.StdEncoding.EncodeToString(buffer)
-	return "data:image/png;base64," + encoded
+	return "data:image/jpg;base64," + encoded
 
 }
