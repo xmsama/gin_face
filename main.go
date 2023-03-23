@@ -1,9 +1,14 @@
 package main
 
 import (
+	"encoding/binary"
 	"face/Db"
 	"face/Global"
+	"face/Models"
 	"face/Route"
+	"fmt"
+	"github.com/Kagami/go-face"
+	"math"
 )
 
 const dataDir = "testdata"
@@ -15,48 +20,48 @@ const (
 )
 
 func main() {
-	Global.ImgPath = "./image/"
+	Global.ImgPath = "./img"
 	Global.JWTKey = "jnjhJ9D@2^32jkFgVfOt"
 	Global.DB, _ = Db.GetDB()
 	Route.InitRouter()
-	////初始化人脸识别器
-	//rec, err := face.NewRecognizer(modelDir)
-	//if err != nil {
-	//	fmt.Println("Cannot INItialize recognizer")
-	//}
-	//defer rec.Close()
-
+	//初始化人脸识别器
+	FaceRe, err := face.NewRecognizer(modelDir)
+	//FaceRe.RecognizeSingle()
+	if err != nil {
+		fmt.Println("Cannot INItialize recognizer")
+	}
+	//////defer rec.Close()
+	Global.FaceRe = FaceRe
 	//干一个数据库
 
-	//db := Global.DB
+	db := Global.DB
 
-	//识别测试
-	//var FaceList []Models.Face
-	//var samples []face.Descriptor
-	//db.Find(&FaceList)
-	//var cats []int32
-	//fmt.Println(time.Now())
-	//for _, faceData := range FaceList {
-	//	cats = append(cats, int32(faceData.Id))
-	//	floatData := make([]float32, len(faceData.Data)/4)
-	//	for i := 0; i < len(floatData); i++ {
-	//		bytes := faceData.Data[i*4 : (i+1)*4]
-	//		floatValue := math.Float32frombits(binary.LittleEndian.Uint32(bytes))
-	//		floatData[i] = floatValue
-	//	}
-	//	var descriptor face.Descriptor
-	//	copy(descriptor[:], floatData)
-	//
-	//	//fmt.Println(faceData.Name)
-	//	//sample, err := face.DescriptorDeserialize(faceData.Data)
-	//	//if err != nil {
-	//	//	// 处理错误
-	//	//}
-	//	//fmt.Println(descriptor)
-	//	samples = append(samples, descriptor)
-	//	//labels = append(labels, int32(faceData.ID))
-	//}
-	//rec.SetSamples(samples, cats)
+	//载入识别集
+	var FaceList []Models.Face
+	var samples []face.Descriptor
+	db.Find(&FaceList)
+	var cats []int32
+	for _, faceData := range FaceList {
+		cats = append(cats, int32(faceData.Id))
+		floatData := make([]float32, len(faceData.Data)/4)
+		for i := 0; i < len(floatData); i++ {
+			bytes := faceData.Data[i*4 : (i+1)*4]
+			floatValue := math.Float32frombits(binary.LittleEndian.Uint32(bytes))
+			floatData[i] = floatValue
+		}
+		var descriptor face.Descriptor
+		copy(descriptor[:], floatData)
+
+		//fmt.Println(faceData.Name)
+		//sample, err := face.DescriptorDeserialize(faceData.Data)
+		//if err != nil {
+		//	// 处理错误
+		//}
+		//fmt.Println(descriptor)
+		samples = append(samples, descriptor)
+		//labels = append(labels, int32(faceData.ID))
+	}
+	Global.FaceRe.SetSamples(samples, cats)
 	//nayoungFace, err := rec.RecognizeSingleFile(imagesDir + "/wx.jpg")
 	//catID := rec.Classify(nayoungFace.Descriptor)
 	//fmt.Println(catID)

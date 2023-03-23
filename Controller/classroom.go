@@ -12,9 +12,10 @@ import (
 
 func GetClassRoomList(c *gin.Context) {
 	type List struct {
-		Name     string `json:"Name"`
-		ID       string `json:"ID"`
-		SignTime int    `json:"SignTime"`
+		Name       string `json:"Name"`
+		ID         int    `json:"ID"`
+		SignTime   int    `json:"SignTime"`
+		TqSigntime int    `json:"TqSigntime"`
 	}
 	type Data struct {
 		List     []List `json:"list"`
@@ -52,7 +53,7 @@ func GetClassRoomList(c *gin.Context) {
 
 	for _, record := range ClassRoom {
 
-		list := []List{{ID: strconv.Itoa(record.Id), Name: record.Name, SignTime: record.Signtime}}
+		list := []List{{ID: record.Id, Name: record.Name, SignTime: record.Signtime, TqSigntime: record.TqSigntime}}
 		AllList = append(AllList, list...)
 	}
 	c.JSON(http.StatusOK, LessonResp{
@@ -71,8 +72,10 @@ func SetClassRoom(c *gin.Context) {
 
 	//Id := ReqMap["ID"]
 	Name := fmt.Sprintf("%v", ReqMap["Name"])
-	Id := fmt.Sprintf("%v", ReqMap["ID"])
+	Id := ReqMap["ID"]
+
 	Signtime, err := strconv.Atoi(fmt.Sprintf("%v", ReqMap["SignTime"]))
+	TqSigntime, err := strconv.Atoi(fmt.Sprintf("%v", ReqMap["TqSigntime"]))
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"code": 7,
@@ -84,12 +87,12 @@ func SetClassRoom(c *gin.Context) {
 	var Msg string
 	db := Global.DB
 
-	if Id == "" {
+	if Id == "" || Id == nil {
 		NewLessonTime := Models.Classroom{Name: Name, Signtime: Signtime}
 		db.Create(&NewLessonTime)
 		Msg = "新增成功"
 	} else {
-		db.Model(&Global.ClassRoomModel).Where("id = ?", Id).Updates(map[string]interface{}{"signtime": Signtime})
+		db.Model(&Global.ClassRoomModel).Where("id = ?", Id).Updates(map[string]interface{}{"signtime": Signtime, "name": Name, "tqsignime": TqSigntime})
 		Msg = "修改成功"
 	}
 
@@ -102,13 +105,22 @@ func SetClassRoom(c *gin.Context) {
 
 func DelClassRoom(c *gin.Context) {
 	data, _ := c.GetRawData()
-	var ReqMap map[string]string
+	var ReqMap map[string]int
 	err := Utils.UnmarshalJSON(c, data, &ReqMap)
 	if err != nil {
 		return
 	}
 	ID := ReqMap["ID"]
 	db := Global.DB
+	var Count int64
+	db.Model(&Global.LessonModel).Where("classroomid = ? ", ID).Count(&Count)
+	if Count > 0 {
+		c.JSON(http.StatusOK, gin.H{
+			"code": 7,
+			"msg":  "有课程绑定当前教室 请删除课程后再试！",
+		})
+		return
+	}
 	db.Where("id = ?", ID).Delete(&Models.Classroom{})
 	c.JSON(http.StatusOK, gin.H{
 		"code": 0,

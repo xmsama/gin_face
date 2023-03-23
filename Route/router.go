@@ -32,18 +32,28 @@ func InitRouter() {
 
 		api.POST("/GetUserList", Controller.GetUserList)
 		api.POST("/SetUserInfo", Controller.SetUserInfo)
+		api.POST("/DelUser", Controller.DelUser)
 
 		api.POST("/GetLessonTime", Controller.GetLessonTime)
 		api.POST("/SetLessonTime", Controller.SetLessonTime)
 		api.POST("/DelLessonTime", Controller.DelLessonTime)
 
 		api.POST("/GetLessonList", Controller.GetLessonList)
+		api.POST("/SetLessonInfo", Controller.SetLessonInfo)
+		api.POST("/DelLesson", Controller.DelLesson)
 
 		api.POST("/GetClassRoomList", Controller.GetClassRoomList)
 		api.POST("/SetClassRoom", Controller.SetClassRoom)
 		api.POST("/DelClassRoom", Controller.DelClassRoom)
 		api.POST("/Upload", Controller.Upload)
 
+		api.POST("/GetSignHistory", Controller.GetSignHistory)
+		api.POST("/DelSignInfo", Controller.DelSignHistory)
+		api.POST("/GetSignInfo", Controller.GetSignInfo)
+
+		api.POST("/HeartBeat", Controller.HeartBeat)
+		api.POST("/Detected", Controller.Detected)
+
 	}
-	router.Run(":8887")
+	router.Run(":8888")
 }
