@@ -24,6 +24,7 @@ func AddFace(ID int, B64Blob []byte) {
 		fmt.Println("识别出现错误", err)
 	}
 	descriptor := faces[0].Descriptor
+	//fmt.Println(len(faces))
 	descriptorBytes := (*(*[1 << 30]byte)(unsafe.Pointer(&descriptor[0])))[:len(descriptor)*4]
 	db.Model(&Global.UserListModel).Where("id=  ? ", ID).Updates(map[string]interface{}{"face": descriptorBytes})
 	//db.Create(&Models.Face{Name: Name, Data: descriptorBytes})

@@ -23,7 +23,7 @@ func main() {
 	Global.ImgPath = "./img"
 	Global.JWTKey = "jnjhJ9D@2^32jkFgVfOt"
 	Global.DB, _ = Db.GetDB()
-	Route.InitRouter()
+
 	//初始化人脸识别器
 	FaceRe, err := face.NewRecognizer(modelDir)
 	//FaceRe.RecognizeSingle()
@@ -37,21 +37,21 @@ func main() {
 	db := Global.DB
 
 	//载入识别集
-	var FaceList []Models.Face
+	var FaceList []Models.UserList
 	var samples []face.Descriptor
 	db.Find(&FaceList)
 	var cats []int32
 	for _, faceData := range FaceList {
+		fmt.Println(faceData.Id)
 		cats = append(cats, int32(faceData.Id))
-		floatData := make([]float32, len(faceData.Data)/4)
+		floatData := make([]float32, len(faceData.Face)/4)
 		for i := 0; i < len(floatData); i++ {
-			bytes := faceData.Data[i*4 : (i+1)*4]
+			bytes := faceData.Face[i*4 : (i+1)*4]
 			floatValue := math.Float32frombits(binary.LittleEndian.Uint32(bytes))
 			floatData[i] = floatValue
 		}
 		var descriptor face.Descriptor
 		copy(descriptor[:], floatData)
-
 		//fmt.Println(faceData.Name)
 		//sample, err := face.DescriptorDeserialize(faceData.Data)
 		//if err != nil {
@@ -62,6 +62,7 @@ func main() {
 		//labels = append(labels, int32(faceData.ID))
 	}
 	Global.FaceRe.SetSamples(samples, cats)
+	fmt.Println("数据集载入成功 共:")
 	//nayoungFace, err := rec.RecognizeSingleFile(imagesDir + "/wx.jpg")
 	//catID := rec.Classify(nayoungFace.Descriptor)
 	//fmt.Println(catID)
@@ -117,5 +118,5 @@ func main() {
 	//fmt.Printf("n1的类型是: %T, n1占用的字节数是: %d\n", descriptor, unsafe.Sizeof(descriptor))
 	//descriptorBytes := (*(*[1 << 30]byte)(unsafe.Pointer(&descriptor[0])))[:len(descriptor)*4]
 	//fmt.Println(descriptorBytes)
-
+	Route.InitRouter()
 }

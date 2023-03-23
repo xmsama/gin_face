@@ -8,7 +8,6 @@ import (
 
 var (
 	DB               *gorm.DB
-	FaceModel        Models.Face
 	CaptchaModel     Models.Captcha
 	AccountModel     Models.Account
 	ClassModel       Models.Class
