@@ -7,6 +7,7 @@ import (
 	"github.com/goccy/go-json"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -31,6 +32,15 @@ func UnmarshalJSON(c *gin.Context, data []byte, v interface{}, msg ...string) er
 func stringInSlice(a string, list []string) bool {
 	for _, b := range list {
 		if b == a {
+			return true
+		}
+	}
+	return false
+}
+
+func InSlice(s string, slice []string) bool {
+	for _, v := range slice {
+		if strings.Contains(s, v) {
 			return true
 		}
 	}

@@ -6,7 +6,6 @@ type UserList struct {
 	UserClass int    `gorm:"column:userclass;type:int(11)"`
 	Image     string `gorm:"column:image;type:varchar(255)"`
 	Face      []byte `gorm:"column:face;type:blob"`
-	Status    int    `gorm:"column:status;type:int(11)"`
 	Time      int    `gorm:"column:time;type:int(11)"`
 }
 

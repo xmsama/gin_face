@@ -84,9 +84,6 @@ func GetClassList(c *gin.Context) {
 	page, _ := strconv.Atoi(fmt.Sprintf("%v", datamap["page"]))
 	pageSize, _ := strconv.Atoi(fmt.Sprintf("%v", datamap["pageSize"]))
 	var Total int64
-	//fmt.Println(page)
-	//fmt.Println(pageSize)
-	//fmt.Println(Total)
 	if tempsql != "" {
 		db.Where(tempsql).Offset((page - 1) * pageSize).Limit(pageSize).Order("time desc").Find(&Class)
 		db.Model(&Global.ClassModel).Where(tempsql).Count(&Total)
@@ -101,15 +98,10 @@ func GetClassList(c *gin.Context) {
 		list := []List{{Name: record.Name, Count: int(Count), ID: record.Id, Status: "正常", Time: int(time.Now().Unix())}}
 		AllList = append(AllList, list...)
 	}
-
 	c.JSON(http.StatusOK, ClassListResp{
 		0,
 		Data{List: AllList, Total: int(Total), Page: page, PageSize: pageSize},
 	})
-	//c.JSON(http.StatusOK, gin.H{
-	//	"code": 0,
-	//	"msg":  "giao",
-	//})
 }
 
 func Upload(c *gin.Context) {

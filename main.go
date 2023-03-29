@@ -31,12 +31,10 @@ func main() {
 		fmt.Println("Cannot INItialize recognizer")
 	}
 	//////defer rec.Close()
+
 	Global.FaceRe = FaceRe
-	//干一个数据库
 
 	db := Global.DB
-
-	//载入识别集
 	var FaceList []Models.UserList
 	var samples []face.Descriptor
 	db.Find(&FaceList)
@@ -52,17 +50,9 @@ func main() {
 		}
 		var descriptor face.Descriptor
 		copy(descriptor[:], floatData)
-		//fmt.Println(faceData.Name)
-		//sample, err := face.DescriptorDeserialize(faceData.Data)
-		//if err != nil {
-		//	// 处理错误
-		//}
-		//fmt.Println(descriptor)
 		samples = append(samples, descriptor)
-		//labels = append(labels, int32(faceData.ID))
 	}
 	Global.FaceRe.SetSamples(samples, cats)
-	fmt.Println("数据集载入成功 共:")
 	//nayoungFace, err := rec.RecognizeSingleFile(imagesDir + "/wx.jpg")
 	//catID := rec.Classify(nayoungFace.Descriptor)
 	//fmt.Println(catID)

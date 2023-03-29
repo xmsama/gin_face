@@ -15,7 +15,7 @@ func GetClassRoomList(c *gin.Context) {
 		Name       string `json:"Name"`
 		ID         int    `json:"ID"`
 		SignTime   int    `json:"SignTime"`
-		TqSigntime int    `json:"TqSigntime"`
+		TqSignTime int    `json:"TqSignTime"`
 	}
 	type Data struct {
 		List     []List `json:"list"`
@@ -53,7 +53,7 @@ func GetClassRoomList(c *gin.Context) {
 
 	for _, record := range ClassRoom {
 
-		list := []List{{ID: record.Id, Name: record.Name, SignTime: record.Signtime, TqSigntime: record.TqSigntime}}
+		list := []List{{ID: record.Id, Name: record.Name, SignTime: record.Signtime, TqSignTime: record.TqSigntime}}
 		AllList = append(AllList, list...)
 	}
 	c.JSON(http.StatusOK, LessonResp{
@@ -75,7 +75,7 @@ func SetClassRoom(c *gin.Context) {
 	Id := ReqMap["ID"]
 
 	Signtime, err := strconv.Atoi(fmt.Sprintf("%v", ReqMap["SignTime"]))
-	TqSigntime, err := strconv.Atoi(fmt.Sprintf("%v", ReqMap["TqSigntime"]))
+	TqSigntime, err := strconv.Atoi(fmt.Sprintf("%v", ReqMap["TqSignTime"]))
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"code": 7,
@@ -92,7 +92,7 @@ func SetClassRoom(c *gin.Context) {
 		db.Create(&NewLessonTime)
 		Msg = "新增成功"
 	} else {
-		db.Model(&Global.ClassRoomModel).Where("id = ?", Id).Updates(map[string]interface{}{"signtime": Signtime, "name": Name, "tqsignime": TqSigntime})
+		db.Model(&Global.ClassRoomModel).Where("id = ?", Id).Updates(map[string]interface{}{"signtime": Signtime, "name": Name, "tqsigntime": TqSigntime})
 		Msg = "修改成功"
 	}
 
