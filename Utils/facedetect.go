@@ -2,11 +2,8 @@ package Utils
 
 import (
 	"encoding/base64"
-	"face/Global"
 	"fmt"
 	"os"
-	"strconv"
-	"unsafe"
 )
 
 func AddFace(ID int, B64Blob []byte) {
@@ -17,15 +14,15 @@ func AddFace(ID int, B64Blob []byte) {
 	//	fmt.Println("B64图片解码失败:", err)
 	//	return
 	//}
-	db := Global.DB
-	db.Model(&Global.UserListModel).Where("id=  ? ", ID).Updates(map[string]interface{}{"image": Global.ImgPath + "/" + strconv.Itoa(ID) + ".jpg"})
-	faces, err := Global.FaceRe.RecognizeFile(Global.ImgPath + "/" + strconv.Itoa(ID) + ".jpg")
-	if err != nil {
-		fmt.Println("识别出现错误", err)
-	}
-	descriptor := faces[0].Descriptor
-	descriptorBytes := (*(*[1 << 30]byte)(unsafe.Pointer(&descriptor[0])))[:len(descriptor)*4]
-	db.Model(&Global.UserListModel).Where("id=  ? ", ID).Updates(map[string]interface{}{"face": descriptorBytes})
+	//db := Global.DB
+	//db.Model(&Global.UserListModel).Where("id=  ? ", ID).Updates(map[string]interface{}{"image": Global.ImgPath + "/" + strconv.Itoa(ID) + ".jpg"})
+	//faces, err := Global.FaceRe.RecognizeFile(Global.ImgPath + "/" + strconv.Itoa(ID) + ".jpg")
+	//if err != nil {
+	//	fmt.Println("识别出现错误", err)
+	//}
+	//descriptor := faces[0].Descriptor
+	//descriptorBytes := (*(*[1 << 30]byte)(unsafe.Pointer(&descriptor[0])))[:len(descriptor)*4]
+	//db.Model(&Global.UserListModel).Where("id=  ? ", ID).Updates(map[string]interface{}{"face": descriptorBytes})
 
 }
 

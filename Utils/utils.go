@@ -6,9 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/goccy/go-json"
 	"net/http"
-	"strconv"
 	"strings"
-	"time"
 )
 
 func UnmarshalJSON(c *gin.Context, data []byte, v interface{}, msg ...string) error {
@@ -47,42 +45,20 @@ func InSlice(s string, slice []string) bool {
 	return false
 }
 func SearchSql(value map[string]interface{}, cut int) string {
-	resouce := []string{"primogem", "acquaint", "intertwined", "level"}
-	exclude := []string{"page", "pageSize", "primogemmax", "acquaintmax", "intertwinedmax", "levelmax"}
+	exclude := []string{"page", "pageSize"}
 	//转义msg
 	if value["msg"] != nil {
 		msgstr := fmt.Sprintf("%v", value["msg"])
 		encoded := base64.StdEncoding.EncodeToString([]byte(msgstr))
 		value["msg"] = encoded
 	}
-	NowTime := int(time.Now().Unix())
+	//NowTime := int(time.Now().Unix())
 	var tempsql string
 	for key, val := range value {
 
 		valstr := fmt.Sprintf("%v", val)
-		if stringInSlice(key, resouce) && val != "" {
-			max := value[key+"max"]
-			if max == "" {
-				max = "2100000000"
-			}
-			maxstr := fmt.Sprintf("%v", max)
-			tempsql = tempsql + key + ">=" + valstr + " and " + key + "<=" + maxstr
-		} else if key == "runtime" && val != "" {
-			valformat, _ := strconv.Atoi(valstr)
-			tempsql = tempsql + "(" + strconv.Itoa(int(time.Now().Unix())) + "- logintime)>=" + strconv.Itoa(valformat*3600)
-		} else if key == "lastupdate" && val != "" {
-			valformat, _ := strconv.Atoi(valstr)
-			tempsql = tempsql + "time <= " + strconv.Itoa(valformat/1000+86399)
-		} else if key == "machine" && val != "" {
-			tempsql = tempsql + "hwid in (select hwid from machine where name='" + valstr + "')"
-		} else if key == "online" && len(valstr) > 0 {
-			//fmt.Println("online")
-			if valstr == "0" {
-				tempsql = tempsql + "time+60>" + strconv.Itoa(NowTime)
-			} else if valstr == "1" {
-				tempsql = tempsql + "time+60<" + strconv.Itoa(NowTime)
-			}
-		} else if !stringInSlice(key, exclude) && val != "" {
+
+		if !stringInSlice(key, exclude) && val != "" {
 			tempsql = tempsql + key + " like '%" + valstr + "%'"
 		}
 

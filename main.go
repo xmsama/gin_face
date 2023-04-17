@@ -53,6 +53,7 @@ func main() {
 		samples = append(samples, descriptor)
 	}
 	Global.FaceRe.SetSamples(samples, cats)
+
 	//nayoungFace, err := rec.RecognizeSingleFile(imagesDir + "/wx.jpg")
 	//catID := rec.Classify(nayoungFace.Descriptor)
 	//fmt.Println(catID)

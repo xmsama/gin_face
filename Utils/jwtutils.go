@@ -7,9 +7,8 @@ import (
 	"strconv"
 )
 
-var JWT_SECRET_KEY = Global.JWTKey
-
 func Decode_jwt_token(encoded_jwt string, node string) string {
+	JWT_SECRET_KEY := Global.JWTKey
 	token, err := jwt.Parse(encoded_jwt, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])

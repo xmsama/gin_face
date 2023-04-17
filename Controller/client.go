@@ -7,6 +7,7 @@ import (
 	"face/Utils"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 	"math/rand"
 	"net/http"
 	"os"
@@ -81,7 +82,6 @@ func GetRandom() string {
 	temp := builder.String()
 	return temp
 }
-
 func Detected(c *gin.Context) {
 	data, _ := c.GetRawData()
 	var ReqMap map[string]interface{}
@@ -113,10 +113,22 @@ func Detected(c *gin.Context) {
 	if err != nil {
 		fmt.Println("RecognizeSingle:", err)
 	}
+	var Info Models.Info
+	NowDay := time.Now().Format("2006-01-02")
+	db.Where("date= ?", NowDay).Take(&Info)
+	if Info.Date == "" {
+		//不存在这个日期
+		db.Create(&Models.Info{
+			Date:    NowDay,
+			Success: 0,
+			Fail:    0,
+		})
+	}
 	var SignSuccess string
 	for _, record := range DFace {
 		catID := Global.FaceRe.ClassifyThreshold(record.Descriptor, 0.4)
 		if catID == 0 {
+			db.Model(&Global.InfoModel).Where("date= ?", NowDay).Updates(map[string]interface{}{"fail": gorm.Expr("fail + 1")})
 			continue
 		}
 		var User Models.UserList
@@ -127,6 +139,7 @@ func Detected(c *gin.Context) {
 			NewSign := Models.Signhistory{Signid: SignId, User: User.UserName, Time: int(time.Now().Unix())}
 			db.Create(&NewSign)
 		}
+		db.Model(&Global.InfoModel).Where("date= ?", NowDay).Updates(map[string]interface{}{"success": gorm.Expr("success + 1")})
 		SignSuccess += User.UserName + "|"
 	}
 	os.Remove(Global.ImgPath + "/temp/" + FileName)

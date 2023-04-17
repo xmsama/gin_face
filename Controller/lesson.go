@@ -148,8 +148,8 @@ func GetLessonList(c *gin.Context) {
 	var Lesson []Models.Lesson
 
 	var AllList []List
-	//tempsql := Utils.SearchSql(ReqMap, 5)
-	tempsql := ""
+	tempsql := Utils.SearchSql(ReqMap, 5)
+	//tempsql := ""
 	db := Global.DB
 	if tempsql != "" {
 		db.Where(tempsql).Offset((page - 1) * pageSize).Limit(pageSize).Find(&Lesson)

@@ -17,6 +17,7 @@ var (
 	ClassRoomModel   Models.Classroom
 	SignModel        Models.Sign
 	SignHistoryModel Models.Signhistory
+	InfoModel        Models.Info
 	JWTKey           string
 	ImgPath          string
 	FaceRe           *face.Recognizer

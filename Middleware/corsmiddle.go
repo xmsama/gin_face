@@ -24,13 +24,14 @@ func Cors() gin.HandlerFunc {
 		if method == "OPTIONS" {
 			c.AbortWithStatus(http.StatusNoContent)
 		}
-		exclude := []string{"Heart", "Detected", "Login", "Captcha"}
+		exclude := []string{"Heart", "Detected", "Login", "Captcha", "GetSignInfo"}
 		if method != "OPTIONS" && Utils.InSlice(c.Request.URL.String(), exclude) == false {
-
+			//fmt.Println(token)
 			resp := Utils.Decode_jwt_token(token, "username")
+			//fmt.Println(resp)
 			if resp == "106" || resp == "108" {
 				c.Abort()
-				c.JSON(401, gin.H{
+				c.JSON(403, gin.H{
 					"msg": "Token过期",
 				})
 				return

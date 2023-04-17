@@ -41,7 +41,8 @@ func GetSignHistory(c *gin.Context) {
 	db := Global.DB
 	var Sign []Models.Sign
 	var Total int64
-	tempsql := ""
+	tempsql := Utils.SearchSql(ReqMap, 5)
+
 	if tempsql != "" {
 		db.Where(tempsql).Offset((page - 1) * pageSize).Limit(pageSize).Find(&Sign)
 		db.Model(&Global.SignModel).Where(tempsql).Count(&Total)

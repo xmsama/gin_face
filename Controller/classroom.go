@@ -41,7 +41,7 @@ func GetClassRoomList(c *gin.Context) {
 
 	var AllList []List
 
-	tempsql := ""
+	tempsql := Utils.SearchSql(ReqMap, 5)
 	db := Global.DB
 	if tempsql != "" {
 		db.Where(tempsql).Offset((page - 1) * pageSize).Limit(pageSize).Find(&ClassRoom)
