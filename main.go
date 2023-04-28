@@ -40,7 +40,7 @@ func main() {
 	db.Find(&FaceList)
 	var cats []int32
 	for _, faceData := range FaceList {
-		fmt.Println(faceData.Id)
+		//fmt.Println(faceData.Id)
 		cats = append(cats, int32(faceData.Id))
 		floatData := make([]float32, len(faceData.Face)/4)
 		for i := 0; i < len(floatData); i++ {
